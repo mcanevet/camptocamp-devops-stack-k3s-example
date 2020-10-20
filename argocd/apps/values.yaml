@@ -1,0 +1,13 @@
+---
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: ...
+    targetRevision: HEAD
+
+apps:
+  apps:
+    enabled: true
+  core-apps:
+    enabled: true

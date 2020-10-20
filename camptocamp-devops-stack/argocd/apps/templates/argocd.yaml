@@ -1,0 +1,46 @@
+{{- if index $.Values "apps" "argocd" "enabled" }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: argocd/argocd
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    helm:
+      values: |
+        baseDomain: {{ .Values.baseDomain }}
+        # Enable metrics here because CRDs are not available at bootstrap
+        argo-cd:
+          controller:
+            metrics:
+              enabled: true
+          server:
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: selfsigned-issuer
+                traefik.ingress.kubernetes.io/router.entrypoints: websecure
+                traefik.ingress.kubernetes.io/router.tls: "true"
+              hosts:
+                - argocd.apps.{{ .Values.baseDomain }}
+              tls:
+                - secretName: argocd-secret
+                  hosts:
+                    - argocd.apps.{{ .Values.baseDomain }}
+            metrics:
+              enabled: true
+          repoServer:
+            metrics:
+              enabled: true
+  destination:
+    namespace: argocd
+    server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+{{- end }}

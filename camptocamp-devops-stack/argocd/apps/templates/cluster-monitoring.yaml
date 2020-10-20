@@ -1,0 +1,64 @@
+{{- if index $.Values "apps" "cluster-monitoring" "enabled" }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-monitoring
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: argocd/cluster-monitoring
+    repoURL: {{ .Values.spec.source.repoURL }}
+    targetRevision: {{ .Values.spec.source.targetRevision }}
+    helm:
+      values: |
+        baseDomain: {{ .Values.baseDomain }}
+        kube-prometheus-stack:
+          alertmanager:
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: selfsigned-issuer
+                traefik.ingress.kubernetes.io/router.entrypoints: websecure
+                traefik.ingress.kubernetes.io/router.tls: "true"
+              hosts:
+                - alertmanager.apps.{{ .Values.baseDomain }}
+              tls:
+                - secretName: alertmanager-secret
+                  hosts:
+                    - alertmanager.apps.{{ .Values.baseDomain }}
+          grafana:
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: selfsigned-issuer
+                traefik.ingress.kubernetes.io/router.entrypoints: websecure
+                traefik.ingress.kubernetes.io/router.tls: "true"
+              hosts:
+                - grafana.apps.{{ .Values.baseDomain }}
+              tls:
+                - secretName: grafana-secret
+                  hosts:
+                    - grafana.apps.{{ .Values.baseDomain }}
+          prometheus:
+            ingress:
+              enabled: true
+              annotations:
+                cert-manager.io/cluster-issuer: selfsigned-issuer
+                traefik.ingress.kubernetes.io/router.entrypoints: websecure
+                traefik.ingress.kubernetes.io/router.tls: "true"
+              hosts:
+                - prometheus.apps.{{ .Values.baseDomain }}
+              tls:
+                - secretName: prometheus-secret
+                  hosts:
+                    - prometheus.apps.{{ .Values.baseDomain }}
+
+  destination:
+    namespace: cluster-monitoring
+    server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+{{- end }}
