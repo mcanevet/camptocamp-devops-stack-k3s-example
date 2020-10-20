@@ -26,11 +26,6 @@ else
 	iat=$(echo -n "$account_pipeline_tokens" | python3 -c "import sys, json; print(json.load(sys.stdin)[0]['iat'])")
 fi
 
-# Deploy or update app of apps
-helm template applications argocd/applications \
-	--values "$ARTIFACTS_DIR/values.yaml" \
-	-s templates/applications.yaml | kubectl "$KUBECTL_COMMAND" -n argocd -f - || true
-
 # Generate JWT token for "pipeline" user to connect to ArgoCD
 iss="argocd"
 nbf=$iat
@@ -44,6 +39,11 @@ signature=$(echo -n "$header.$payload" | openssl dgst -sha256 -hmac "$secret" -b
 export ARGOCD_AUTH_TOKEN=$header.$payload.$signature
 
 argocd app list
+
+# Deploy or update app of apps
+helm template applications argocd/applications \
+	--values "$ARTIFACTS_DIR/values.yaml" \
+	-s templates/applications.yaml | kubectl "$KUBECTL_COMMAND" -n argocd -f - || true
 
 # TODO: Don't use Gitlab CI specific variable in scripts
 if test -n "$CI_MERGE_REQUEST_ID"; then
@@ -64,7 +64,7 @@ else
 	# FIXME: Because we are using port-forward to communicate with ArgoCD, we
 	# have to log in again when ArgoCD is redeployed (which is the case during
 	# bootstrap). This has to be improved eventually.
-	while ! argocd app wait applications --health --timeout 30; do
+	while ! argocd app wait applications core-applications --health --timeout 30; do
 		kubectl get pods --all-namespaces
 	done
 fi
