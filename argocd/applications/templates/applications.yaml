@@ -1,18 +1,17 @@
-{{- if index $.Values "apps" "apps" "enabled" }}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
-  name: apps
+    argocd.argoproj.io/sync-wave: "10"
+  name: applications
   namespace: argocd
   labels:
     argocd.argoproj.io/instance: apps
 spec:
   project: default
   source:
-    path: argocd/apps
+    path: argocd/applications
     repoURL: {{ .Values.spec.source.repoURL }}
     targetRevision: {{ .Values.spec.source.targetRevision }}
     helm:
@@ -24,4 +23,3 @@ spec:
   syncPolicy:
     automated:
       selfHeal: true
-{{- end }}
