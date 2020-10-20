@@ -60,11 +60,11 @@ if test -n "$CI_MERGE_REQUEST_ID"; then
   done
 else
 	argocd app list
-	echo "Waiting for app of apps to be in sync"
+	echo "Waiting for app of applications to be in sync"
 	# FIXME: Because we are using port-forward to communicate with ArgoCD, we
 	# have to log in again when ArgoCD is redeployed (which is the case during
 	# bootstrap). This has to be improved eventually.
-	while ! argocd app wait apps --health --timeout 30; do
+	while ! argocd app wait applications --health --timeout 30; do
 		kubectl get pods --all-namespaces
 	done
 fi
