@@ -5,9 +5,3 @@ spec:
   source:
     repoURL: ...
     targetRevision: HEAD
-
-apps:
-  apps:
-    enabled: true
-  core-apps:
-    enabled: true
