@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  name: core-applications
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: argocd/apps
+    repoURL: https://github.com/camptocamp/camptocamp-devops-stack.git
+    targetRevision: v0.6.0
+    helm:
+      values: |
+        {{ toYaml .Values | nindent 8 }}
+  destination:
+    namespace: default
+    server: {{ .Values.spec.destination.server }}
+  syncPolicy:
+    automated:
+      selfHeal: true
