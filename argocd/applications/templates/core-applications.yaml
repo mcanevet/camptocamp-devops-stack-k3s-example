@@ -14,11 +14,13 @@ spec:
     targetRevision: v0.5.0
     helm:
       values: |
-        {{ toYaml .Values | nindent 8 }}
+        baseDomain: {{ .Values.baseDomain }}
         spec:
           source:
             repoUrl: https://github.com/camptocamp/camptocamp-devops-stack.git
             targetRevision: v0.5.0
+          destination:
+            server: {{ .Values.spec.destination.server }}
         apps:
           apps:
             enabled: false
