@@ -1,4 +1,7 @@
 ---
+metadata:
+  name: apps
+
 spec:
   destination:
     server: https://kubernetes.default.svc
