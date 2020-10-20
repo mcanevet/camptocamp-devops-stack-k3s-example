@@ -19,6 +19,9 @@ spec:
           source:
             repoUrl: https://github.com/camptocamp/camptocamp-devops-stack.git
             targetRevision: v0.5.0
+        apps:
+          apps:
+            enabled: false
   destination:
     namespace: default
     server: {{ .Values.spec.destination.server }}
