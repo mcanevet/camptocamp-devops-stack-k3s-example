@@ -55,16 +55,16 @@ deploy: $(ARTIFACTS_DIR)/kubeconfig.yaml get-base-domain
 		--env KUBECTL_COMMAND=apply \
 		--env ARGOCD_OPTS="--plaintext --port-forward --port-forward-namespace argocd" \
 		--env ARTIFACTS_DIR=$(ARTIFACTS_DIR) \
-		argoproj/argocd:v$(ARGOCD_VERSION) $(SCRIPTS_DIR)/deploy.sh #& \
-	# docker run --rm \
-	# 	$(DOCKER_COMMON_ARGS) \
-	# 	--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
-	# 	--mount type=bind,src=$(ARTIFACTS_DIR)/kubeconfig.yaml,dst=/tmp/.kube/config \
-	# 	--env VAULT_ADDR="https://vault.apps.$(BASE_DOMAIN)" \
-	# 	--env CLUSTER_NAME=$(CLUSTER_NAME) \
-	# 	--env ARTIFACTS_DIR=$(ARTIFACTS_DIR) \
-	# 	hashicorp/terraform:$(TERRAFORM_VERSION) $$PWD/scripts/configure-vault.sh & \
-	# wait
+		argoproj/argocd:v$(ARGOCD_VERSION) $(SCRIPTS_DIR)/deploy.sh & \
+	docker run --rm \
+		$(DOCKER_COMMON_ARGS) \
+		--mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+		--mount type=bind,src=$$PWD/$(ARTIFACTS_DIR)/kubeconfig.yaml,dst=/tmp/.kube/config \
+		--env VAULT_ADDR="https://vault.apps.$(BASE_DOMAIN)" \
+		--env CLUSTER_NAME=$(CLUSTER_NAME) \
+		--env ARTIFACTS_DIR=$(ARTIFACTS_DIR) \
+		hashicorp/terraform:$(TERRAFORM_VERSION) $(SCRIPTS_DIR)/configure-vault.sh & \
+	wait
 
 $(ARTIFACTS_DIR)/kubeconfig.yaml: $(ARTIFACTS_DIR)/terraform.tfstate
 	CLUSTER_NAME=$(CLUSTER_NAME) ARTIFACTS_DIR=$(ARTIFACTS_DIR) $(DISTRIBUTION_DIR)/scripts/get-kubeconfig.sh
