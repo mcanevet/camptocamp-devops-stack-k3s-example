@@ -24,6 +24,8 @@ spec:
         apps:
           apps:
             enabled: false
+          demo-app:
+            enabled: false
   destination:
     namespace: default
     server: {{ .Values.spec.destination.server }}
