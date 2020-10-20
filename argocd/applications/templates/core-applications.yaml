@@ -15,6 +15,10 @@ spec:
     helm:
       values: |
         {{ toYaml .Values | nindent 8 }}
+        spec:
+          source:
+            repoUrl: https://github.com/camptocamp/camptocamp-devops-stack.git
+            targetRevision: v0.5.0
   destination:
     namespace: default
     server: {{ .Values.spec.destination.server }}
