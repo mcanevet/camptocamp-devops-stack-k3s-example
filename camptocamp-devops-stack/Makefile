@@ -42,11 +42,11 @@ SCRIPTS_DIR := $$PWD/camptocamp-devops-stack/scripts
 
 .PHONY: test deploy clean debug get-base-domain
 
-# test: deploy get-base-domain
-# 	docker run --rm \
-# 		$(DOCKER_COMMON_ARGS) \
-# 		--env BASE_DOMAIN=$(BASE_DOMAIN) \
-# 		curlimages/curl $$PWD/scripts/test.sh
+test: deploy get-base-domain
+	docker run --rm \
+		$(DOCKER_COMMON_ARGS) \
+		--env BASE_DOMAIN=$(BASE_DOMAIN) \
+		curlimages/curl $(SCRIPTS_DIR)/test.sh
 
 deploy: $(ARTIFACTS_DIR)/kubeconfig.yaml get-base-domain
 	docker run --rm \
