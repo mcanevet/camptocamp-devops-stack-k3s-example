@@ -66,8 +66,12 @@ deploy: $(ARTIFACTS_DIR)/kubeconfig.yaml get-base-domain
 		hashicorp/terraform:$(TERRAFORM_VERSION) $(SCRIPTS_DIR)/configure-vault.sh & \
 	wait
 
+# Get kubernetes context
 $(ARTIFACTS_DIR)/kubeconfig.yaml: $(ARTIFACTS_DIR)/terraform.tfstate
 	CLUSTER_NAME=$(CLUSTER_NAME) ARTIFACTS_DIR=$(ARTIFACTS_DIR) $(DISTRIBUTION_DIR)/scripts/get-kubeconfig.sh
+
+get-base-domain:
+	$(eval BASE_DOMAIN = $(shell ARTIFACTS_DIR=$(ARTIFACTS_DIR) $(DISTRIBUTION_DIR)/scripts/get-base-domain.sh))
 
 $(ARTIFACTS_DIR)/terraform.tfstate: terraform/*.tf
 	docker run --rm \
@@ -78,9 +82,6 @@ $(ARTIFACTS_DIR)/terraform.tfstate: terraform/*.tf
 		--env CLUSTER_NAME=$(CLUSTER_NAME) \
 		--env ARTIFACTS_DIR=$(ARTIFACTS_DIR) \
 		hashicorp/terraform:$(TERRAFORM_VERSION) $(SCRIPTS_DIR)/provision.sh
-
-get-base-domain:
-	$(eval BASE_DOMAIN = $(shell ARTIFACTS_DIR=$(ARTIFACTS_DIR) $(DISTRIBUTION_DIR)/scripts/get-base-domain.sh))
 
 clean: get-base-domain $(ARTIFACTS_DIR)/kubeconfig.yaml
 	docker run --rm \
